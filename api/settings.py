@@ -81,25 +81,25 @@ WSGI_APPLICATION = 'api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'donchorro_db',
-        'USER': 'postgres',
-        'PASSWORD': 'bichis162332',  
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'CONN_MAX_AGE': 600,
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'donchorro_db',
+#         'USER': 'postgres',
+#         'PASSWORD': 'bichis162332',  
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#         'CONN_MAX_AGE': 600,
+#     }
+# }
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'donchorro_db',
-        'USER': 'postgres',
-        'PASSWORD': 'bichis162332',  
-        'HOST': 'localhost',
+        'NAME': 'basedatosdonchorro',
+        'USER': 'basedatosdonchorro_user',
+        'PASSWORD': '7wHPDPP5FzpeZl3z6s2onpY8sFasHyfv',  
+        'HOST': 'dpg-d5a6jt95pdvs73apcc3g-a.oregon-postgres.render.com',
         'PORT': '5432',
         'CONN_MAX_AGE': 600,
     }
