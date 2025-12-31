@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,9 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure--=nz*3c3=d_(6xt^xnmw))7z3-ssz69l#r**$ai8o33(r)@zuf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost','0.0.0.0', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost','0.0.0.0', '127.0.0.1', 'backend-licorera.onrender.com']
+
+RENDER_ENTERNA_HOSTNAME = os.environ.get('RENDER_ENTERNA_HOSTNAME')
+if RENDER_ENTERNA_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_ENTERNA_HOSTNAME)
 
 
 # Application definition
@@ -167,6 +172,9 @@ CORS_ALLOWED_HEADERS = [
     'Content-Type',
     "http://localhost:8080",
     "http://localhost:8000",
+    "https://backend-licorera.onrender.com",
+    "https://donchorro.com.co/",
+    "https://donchorrofront-s10l.onrender.com/",
 ]
 
 REST_FRAMEWORK = {
