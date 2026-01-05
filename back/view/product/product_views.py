@@ -10,7 +10,7 @@ from ...models import Product
 @require_http_methods(["GET"])
 def product_list(request):
     products = Product.objects.filter(active=True).values(
-        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date')
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'imagen')
     paginator = Paginator(products, 10)
     page_number = request.GET.get('page', 1)
     try:
@@ -26,7 +26,7 @@ def product_list(request):
 @require_http_methods(["GET"])
 def product_list_liquars(request):
     products = Product.objects.filter(active=True, category="LICORES").values(
-        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date')
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'imagen')
     paginator = Paginator(products, 10)
     page_number = request.GET.get('page', 1)
     try:
@@ -41,7 +41,7 @@ def product_list_liquars(request):
 @require_http_methods(["GET"])
 def product_list_beer(request):
     products = Product.objects.filter(active=True, category="CERVEZAS").values(
-        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date', "imagen")
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', "imagen")
     paginator = Paginator(products, 10)
     page_number = request.GET.get('page', 1)
     try:
