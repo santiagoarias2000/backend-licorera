@@ -10,7 +10,7 @@ from ...models import Product
 @require_http_methods(["GET"])
 def product_list(request):
     products = Product.objects.filter(active=True).values(
-        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'imagen')
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active')
     paginator = Paginator(products, 10)
     page_number = request.GET.get('page', 1)
     try:
@@ -19,7 +19,12 @@ def product_list(request):
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-    return JsonResponse(list(page_obj.object_list), safe=False)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
 
 
 @csrf_exempt
@@ -27,7 +32,7 @@ def product_list(request):
 def product_list_liquars(request):
     products = Product.objects.filter(active=True, category="LICORES").values(
         'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'imagen')
-    paginator = Paginator(products, 10)
+    paginator = Paginator(products, 12)
     page_number = request.GET.get('page', 1)
     try:
         page_obj = paginator.page(page_number)
@@ -35,7 +40,12 @@ def product_list_liquars(request):
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-    return JsonResponse(list(page_obj.object_list), safe=False)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
 
 @csrf_exempt
 @require_http_methods(["GET"])
@@ -50,13 +60,18 @@ def product_list_beer(request):
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-    return JsonResponse(list(page_obj.object_list), safe=False)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
 
 @csrf_exempt
 @require_http_methods(["GET"])
 def product_list_otros(request):
     products = Product.objects.filter(active=True, category="OTROS").values(
-        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date')
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', "imagen")
     paginator = Paginator(products, 10)
     page_number = request.GET.get('page', 1)
     try:
@@ -65,7 +80,12 @@ def product_list_otros(request):
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-    return JsonResponse(list(page_obj.object_list), safe=False)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
 
 @csrf_exempt
 @require_http_methods(["GET"])
