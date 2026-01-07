@@ -67,25 +67,33 @@ def product_list_beer(request):
             "total_items": paginator.count,
         })
 
+from django.core.paginator import Paginator
+
 @csrf_exempt
 @require_http_methods(["GET"])
 def product_list_otros(request):
-    products = Product.objects.filter(active=True, category="OTROS").values(
-        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', "imagen")
-    paginator = Paginator(products, 10)
-    page_number = request.GET.get('page', 1)
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
+    page_number = int(request.GET.get('page', 1))
+    page_size = 10
+    offset = (page_number - 1) * page_size
+
+    queryset = Product.objects.filter(
+        active=True,
+        category__in=["OTROS", "CIGARILLOS"]
+    ).values(
+        'id', 'name', 'description', 'price',
+        'category', 'stock', 'size', 'active', 'imagen'
+    )
+
+    total_items = queryset.count()
+    products = queryset[offset:offset + page_size]
+
     return JsonResponse({
-            "results": list(page_obj.object_list),
-            "page": page_obj.number,
-            "total_pages": paginator.num_pages,
-            "total_items": paginator.count,
-        })
+        "results": list(products),
+        "page": page_number,
+        "total_pages": (total_items + page_size - 1) // page_size,
+        "total_items": total_items,
+    })
+
 
 @csrf_exempt
 @require_http_methods(["GET"])
@@ -214,21 +222,49 @@ def product_random_by_category(request, category):
 
         # Get 6 random products from the category
         products = Product.objects.filter(
-            active=True, category=category.upper()).order_by('?')[:6]
+            active=True, category=category.upper()).order_by('?')[:8]
         product_list = []
         for product in products:
             product_list.append({
                 'id': product.id,
                 'name': product.name,
-                'description': product.description,
                 'price': str(product.price),
                 'category': product.category,
-                'stock': product.stock,
                 'size': product.size,
-                'active': product.active,
-                'created_date': product.created_date.isoformat(),
-                'updated_date': product.updated_date.isoformat()
+                'imagen': product.imagen,
             })
         return JsonResponse(product_list, safe=False)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def product_filter(request):
+    page = int(request.GET.get("page", 1))
+    page_size = 10
+    offset = (page - 1) * page_size
+
+    search = request.GET.get("search", "").strip()
+
+    queryset = Product.objects.filter(
+        active=True,
+    )
+
+    # 🔍 FILTRO POR NOMBRE
+    if search:
+        queryset = queryset.filter(name__icontains=search)
+
+    total_items = queryset.count()
+
+    products = queryset.order_by("-id").values(
+        "id", "name", "price",
+        "category", "stock", "size", "imagen"
+    )[offset:offset + page_size]
+
+    return JsonResponse({
+        "results": list(products),
+        "page": page,
+        "total_pages": (total_items + page_size - 1) // page_size,
+        "total_items": total_items,
+    })

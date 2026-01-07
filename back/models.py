@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date
+from django.contrib.postgres.indexes import GinIndex
 
 
 class User(models.Model):
@@ -85,6 +86,8 @@ class Product(models.Model):
             models.Index(fields=['otros']),
             models.Index(fields=['category']),
             models.Index(fields=['active']),
+            models.Index(fields=["active", "category"]),
+            GinIndex(fields=["name"], name="product_name_gin", opclasses=["gin_trgm_ops"]),
         ]
 
 

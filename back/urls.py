@@ -26,6 +26,7 @@ urlpatterns = [
     path('products/golosinas', product_views.product_list_candy, name='product_list'),
     path('products/create', product_views.product_create, name='product_create'),
     path('products/<int:pk>/', product_views.product_detail, name='product_detail'),
+    path('product-search/', product_views.product_filter, name='product_detail'),
     path('products/<int:pk>/update/', product_views.product_update, name='product_update'),
     path('products/<int:pk>/delete/', product_views.product_delete, name='product_delete'),
     path('products/random/<str:category>', product_views.product_random_by_category, name='product_random_by_category'),
