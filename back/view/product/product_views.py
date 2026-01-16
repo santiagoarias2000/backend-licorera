@@ -4,14 +4,15 @@ from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 import json
 from ...models import Product
-
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import Func
 
 @csrf_exempt
 @require_http_methods(["GET"])
 def product_list(request):
     products = Product.objects.filter(active=True).values(
         'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active')
-    paginator = Paginator(products, 10)
+    paginator = Paginator(products, 12)
     page_number = request.GET.get('page', 1)
     try:
         page_obj = paginator.page(page_number)
@@ -52,7 +53,7 @@ def product_list_liquars(request):
 def product_list_beer(request):
     products = Product.objects.filter(active=True, category="CERVEZAS").values(
         'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', "imagen")
-    paginator = Paginator(products, 10)
+    paginator = Paginator(products, 12)
     page_number = request.GET.get('page', 1)
     try:
         page_obj = paginator.page(page_number)
@@ -73,7 +74,7 @@ from django.core.paginator import Paginator
 @require_http_methods(["GET"])
 def product_list_otros(request):
     page_number = int(request.GET.get('page', 1))
-    page_size = 10
+    page_size = 12
     offset = (page_number - 1) * page_size
 
     queryset = Product.objects.filter(
@@ -99,8 +100,8 @@ def product_list_otros(request):
 @require_http_methods(["GET"])
 def product_list_candy(request):
     products = Product.objects.filter(active=True, category="GOLOSINAS").values(
-        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date')
-    paginator = Paginator(products, 10)
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'imagen')
+    paginator = Paginator(products, 12)
     page_number = request.GET.get('page', 1)
     try:
         page_obj = paginator.page(page_number)
@@ -108,7 +109,170 @@ def product_list_candy(request):
         page_obj = paginator.page(1)
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
-    return JsonResponse(list(page_obj.object_list), safe=False)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
+    
+@csrf_exempt
+@require_http_methods(["GET"])
+def product_list_aguardiente(request):
+    products = Product.objects.filter(active=True, description="Aguardiente").values(
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date', 'imagen')
+    paginator = Paginator(products, 12)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def product_list_ron(request):
+    products = Product.objects.filter(active=True, description="Ron").values(
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date', 'imagen')
+    paginator = Paginator(products, 12)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def product_list_whiskey(request):
+    products = Product.objects.filter(active=True, description="Whiskey").values(
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date', 'imagen')
+    paginator = Paginator(products, 12)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def product_list_ginebra(request):
+    products = Product.objects.filter(active=True, description="Ginebra").values(
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date', 'imagen')
+    paginator = Paginator(products, 12)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def product_list_tequila(request):
+    products = Product.objects.filter(active=True, description="Tequila").values(
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date', 'imagen')
+    paginator = Paginator(products, 12)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def product_list_cocteles(request):
+    products = Product.objects.filter(active=True, description="Cocteles").values(
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date', 'imagen')
+    paginator = Paginator(products, 12)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
+@csrf_exempt
+@require_http_methods(["GET"])
+def product_list_vino(request):
+    products = Product.objects.filter(active=True, description="Vino").values(
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date', 'imagen')
+    paginator = Paginator(products, 12)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
+@csrf_exempt
+@require_http_methods(["GET"])
+def product_list_champagne(request):
+    products = Product.objects.filter(active=True, description="Champagne").values(
+        'id', 'name', 'description', 'price', 'category', 'stock', 'size', 'active', 'created_date', 'updated_date', 'imagen')
+    paginator = Paginator(products, 12)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return JsonResponse({
+            "results": list(page_obj.object_list),
+            "page": page_obj.number,
+            "total_pages": paginator.num_pages,
+            "total_items": paginator.count,
+        })
 
 
 @csrf_exempt
@@ -238,6 +402,13 @@ def product_random_by_category(request, category):
         return JsonResponse({'error': str(e)}, status=400)
 
 
+
+class Unaccent(Func):
+    function = "unaccent"
+    
+# CREATE EXTENSION IF NOT EXISTS unaccent;
+# CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 @csrf_exempt
 @require_http_methods(["GET"])
 def product_filter(request):
@@ -247,19 +418,26 @@ def product_filter(request):
 
     search = request.GET.get("search", "").strip()
 
-    queryset = Product.objects.filter(
-        active=True,
-    )
+    queryset = Product.objects.filter(active=True)
 
-    # 🔍 FILTRO POR NOMBRE
+    # 🔥 BÚSQUEDA MIXTA (ecommerce real)
     if search:
-        queryset = queryset.filter(name__icontains=search)
+        queryset = queryset.annotate(
+            name_unaccent=Unaccent("name"),
+            similarity=TrigramSimilarity("name", search)
+        ).filter(
+            similarity__gt=0.25
+        ).order_by("-similarity", "-id")
 
     total_items = queryset.count()
-
-    products = queryset.order_by("-id").values(
-        "id", "name", "price",
-        "category", "stock", "size", "imagen"
+    products = queryset.values(
+        "id",
+        "name",
+        "price",
+        "category",
+        "stock",
+        "size",
+        "imagen"
     )[offset:offset + page_size]
 
     return JsonResponse({
