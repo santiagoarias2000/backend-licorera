@@ -6,6 +6,9 @@ import json
 from ...models import Product
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models import Func
+from django.db.models import Q
+import random
+
 
 @csrf_exempt
 @require_http_methods(["GET"])
@@ -379,28 +382,73 @@ def product_delete(request, pk):
 @require_http_methods(["GET"])
 def product_random_by_category(request, category):
     try:
-        # Validate category
-        valid_categories = [choice[0] for choice in Product.CATEGORY_CHOICES]
-        if category.upper() not in valid_categories:
-            return JsonResponse({'error': 'Invalid category'}, status=400)
+        category = category.upper()
 
-        # Get 6 random products from the category
-        products = Product.objects.filter(
-            active=True, category=category.upper()).order_by('?')[:8]
-        product_list = []
-        for product in products:
-            product_list.append({
+        # Categorías reales del modelo
+        valid_categories = [choice[0] for choice in Product.CATEGORY_CHOICES]
+
+        # Categorías virtuales (NO van en el model)
+        LICOR_SUBCATEGORIES = {
+            "RON": "ron",
+            "AGUARDIENTE": "aguardiente",
+            "WHISKEY": "whiskey",
+            "GINEBRA": "ginebra",
+            "TEQUILA": "tequila",
+            "COCTELES": "coctel",
+            "VINO": "vino",
+            "CHAMPAGNE": "champagne",
+        }
+
+        queryset = Product.objects.none()
+
+        if category in valid_categories:
+            queryset = Product.objects.filter(
+                active=True,
+                category=category
+            )
+
+        elif category in LICOR_SUBCATEGORIES:
+            sub = LICOR_SUBCATEGORIES[category]
+            queryset = Product.objects.filter(
+                active=True,
+                category="LICORES",
+                description__icontains=sub
+            )
+
+        # 🔴 Categoría inválida
+        else:
+            return JsonResponse(
+                {"error": "Categoría no válida"},
+                status=400
+            )
+
+        ids = list(queryset.values_list("id", flat=True))
+
+        if not ids:
+            return JsonResponse([], safe=False)
+
+        # ⚡ Sample rápido
+        sample_ids = random.sample(ids, min(8, len(ids)))
+
+        products = Product.objects.filter(id__in=sample_ids)
+
+        product_list = [
+            {
                 'id': product.id,
                 'name': product.name,
                 'price': str(product.price),
                 'category': product.category,
                 'size': product.size,
                 'imagen': product.imagen,
-            })
+                'description': product.description,
+            }
+            for product in products
+        ]
+
         return JsonResponse(product_list, safe=False)
+
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
-
 
 
 class Unaccent(Func):
